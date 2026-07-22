@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Re-run with filters",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Re-run a previous job with additional filters"
+            }
+          }
+        ],
+        "send": {
+          "callback": "job:rerun"
+        }
+      }
+    ]
+  }
+]
