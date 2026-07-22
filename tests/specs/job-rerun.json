@@ -1,19 +1,132 @@
 [
   {
-    "name": "Re-run with filters",
+    "name": "re-run button starts filter flow",
     "steps": [
       {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "re-run confirm with no filters",
+    "steps": [
+      {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "rerun:confirm:yes" },
+        "expect": [
+          { "method": "editMessageText", "payload": { "text": "Re-run started — processing with your filters…" } },
+          { "method": "sendMessage", "payload": { "text": "Re-fetching log files…" } },
+          { "method": "sendMessage", "payload": { "text": "Applying filters and re-extracting…" } },
+          { "method": "sendMessage", "payload": { "text": "Building updated ZIP archive…" } },
+          { "method": "sendMessage", "payload": { "text": "Done — 2 log files processed, 842 lines extracted." } },
+          { "method": "sendMessage", "payload": { "text": "📎 log_extract_result_rerun.zip" } }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "re-run with time range filter",
+    "steps": [
+      {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "2026-01-01 to 2026-01-31" },
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "Re-run a previous job with additional filters"
-            }
+            "payload": { "text": "Time range set: 2026-01-01 to 2026-01-31. Send more filters or tap Confirm." }
           }
-        ],
-        "send": {
-          "callback": "job:rerun"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "re-run with filename glob filter",
+    "steps": [
+      {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "*.log" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Filename pattern set: *.log. Send more filters or tap Confirm." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "re-run with regex filter",
+    "steps": [
+      {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "ERROR|WARN" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Regex set: ERROR|WARN. Send more filters or tap Confirm." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "re-run cancel returns to menu",
+    "steps": [
+      {
+        "send": { "callback": "job:rerun" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Send filter parameters for the re-run, or tap Confirm to re-run with no filters.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "extract:cancel" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Extraction cancelled. Tap a button below to get started." }
+          }
+        ]
       }
     ]
   }
