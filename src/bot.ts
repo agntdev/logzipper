@@ -5,8 +5,25 @@ import type { StorageAdapter } from "grammy";
 // The per-chat session shape (ephemeral conversation state only). Extend as the
 // bot grows. Durable domain data must NOT live here — use the toolkit's
 // persistent storage (see AGENTS.md).
+export type ExtractStep =
+  | "idle"
+  | "awaiting_path"
+  | "awaiting_filters"
+  | "confirming";
+
+export interface JobRecord {
+  id: string;
+  remotePath: string;
+  filters: { timeRange?: string; filenameGlob?: string; regex?: string };
+  status: "pending" | "processing" | "completed" | "failed";
+  createdAt: number;
+}
+
 export interface Session {
-  // example: step?: "awaiting_amount";
+  extractStep?: ExtractStep;
+  jobId?: string;
+  remotePath?: string;
+  filters: { timeRange?: string; filenameGlob?: string; regex?: string };
 }
 
 export type Ctx = BotContext<Session>;
@@ -42,7 +59,7 @@ export interface BuildBotOptions {
  */
 export async function buildBot(token: string, opts: BuildBotOptions = {}) {
   const bot = createBot<Session>(token, {
-    initial: () => ({}),
+    initial: () => ({ filters: {} }),
     storage: opts.storage,
   });
 

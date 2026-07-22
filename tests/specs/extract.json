@@ -1,19 +1,200 @@
 [
   {
-    "name": "/extract",
+    "name": "/extract asks for remote path",
     "steps": [
       {
+        "send": { "text": "/extract" },
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "Initiate a new log extraction job"
-            }
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
           }
-        ],
-        "send": {
-          "text": "/extract"
-        }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "full extraction happy path",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "text": "https://logs.example.com/app" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Got it. Send filter parameters, or tap Confirm to start with defaults.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "extract:confirm:yes" },
+        "expect": [
+          { "method": "editMessageText", "payload": { "text": "Job started — fetching and parsing logs…" } },
+          { "method": "sendMessage", "payload": { "text": "Downloading log files…" } },
+          { "method": "sendMessage", "payload": { "text": "Parsing and extracting fields…" } },
+          { "method": "sendMessage", "payload": { "text": "Building ZIP archive…" } },
+          { "method": "sendMessage", "payload": { "text": "Done — 3 log files processed, 1,247 lines extracted." } },
+          { "method": "sendMessage", "payload": { "text": "📎 log_extract_result.zip" } }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "SFTP path shows auth error",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "text": "sftp://server.example.com/logs" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Got it. Send filter parameters, or tap Confirm to start with defaults.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "extract:confirm:yes" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Authentication is required for SFTP paths. This bot doesn't store credentials — use a publicly accessible path or an HTTP URL instead." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "setting time range filter",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "text": "https://logs.example.com/app" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Got it. Send filter parameters, or tap Confirm to start with defaults.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "2026-01-01 to 2026-01-31" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Time range set: 2026-01-01 to 2026-01-31. Send more filters or tap Confirm." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "setting filename glob filter",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "text": "https://logs.example.com/app" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Got it. Send filter parameters, or tap Confirm to start with defaults.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "*.log" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Filename pattern set: *.log. Send more filters or tap Confirm." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "setting regex filter",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "text": "https://logs.example.com/app" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Got it. Send filter parameters, or tap Confirm to start with defaults.\n\nYou can send one or more of:\n• Time range — e.g. 2026-01-01 to 2026-01-31\n• Filename glob — e.g. *.log\n• Regex — e.g. ERROR|WARN" }
+          }
+        ]
+      },
+      {
+        "send": { "text": "ERROR|WARN" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Regex set: ERROR|WARN. Send more filters or tap Confirm." }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cancel extraction flow",
+    "steps": [
+      {
+        "send": { "text": "/extract" },
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": { "text": "Send me the remote folder path or URL where your logs are stored." }
+          }
+        ]
+      },
+      {
+        "send": { "callback": "extract:cancel" },
+        "expect": [
+          {
+            "method": "editMessageText",
+            "payload": { "text": "Extraction cancelled. Tap a button below to get started." }
+          }
+        ]
       }
     ]
   }
